@@ -1,0 +1,115 @@
+\documentclass[12pt, landscape, a3paper] {article} 
+\usepackage[utf8] {inputenc} 
+\usepackage[T2A]{fontenc} 
+\usepackage[english, russian] {babel} 
+\usepackage[usenames,dvipsnames]{xcolor} 
+\usepackage{listings,longtable,amsmath,amsfonts,graphicx,tikz,amssymb} 
+\usepackage{indentfirst,verbatim} 
+\usepackage[top=30pt,bottom=30pt,left=48pt,right=46pt]{geometry} 
+\usepackage{proof}
+\AtBeginDocument{\colorlet{defaultcolor}{.}}
+
+\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small}}{}
+
+\begin{document}
+\frenchspacing
+\pagestyle{empty}
+\section{ДЗ 3. Денис Мирзоев}
+
+\begin{enumerate} \setcounter{enumi}{4}
+
+    \item $\lambda x y z . x (y z (z x))$
+
+        имеет тип $ (\alpha \to \beta) \to (((\alpha \to \beta) \to \gamma) \to \gamma \to \alpha) \to ((\alpha \to \beta) \to \gamma) \to \beta$
+
+    \item $\alpha \to \alpha$ 
+
+        Терм с таким типом: $\lambda x.x$
+
+    \item $\alpha \to \alpha \to \alpha$
+
+        Термы с таким типом: $\lambda xy.x$, $\lambda xy.y$.
+
+    \item $\alpha \to \alpha \to \alpha \to \alpha$
+
+        Термы с таким типом: $\lambda xyz.x$, $\lambda xyz.y$, $\lambda xyz.z$.
+
+    \item $\alpha$
+
+        Замкнутых термов с таким типом нет.
+
+    \item $\alpha \to \beta \to \alpha$
+
+        Терм с таким типом: $\lambda xy.x$.
+
+    \item $\alpha \to \beta \to (\alpha \to \beta \to \gamma) \to \gamma$
+
+        Пример термов с таким типом: $\lambda xyz.zxy$
+
+    \item $\alpha \to (\alpha \to \alpha) \to \alpha$
+
+        Примеры термов с таким типом: $\lambda xy.x$, $\lambda xy.yx$, $\lambda xy.y(yx)$, $\lambda xy.y(y(x))$, \ldots
+
+    \item $((\alpha \to \beta) \to \alpha) \to (\alpha \to \alpha \to \beta) \to \beta$
+
+        Пример: $\lambda fg.(\lambda h.ghh)(f(\lambda h.ghh))$
+
+    \item $((((\alpha \to \beta) \to \alpha) \to \alpha) \to \beta) \to \alpha$
+
+        Пример: $\lambda f.f(\lambda g.g(\lambda h.f(\lambda i.h)))$
+
+    \item $S K K = ((\lambda x^{\tau\to(\sigma\to\tau)\to\tau}y^{\tau\to\sigma\to\tau}z^\tau.xz(yz))(\lambda a^\tau b^{\sigma\to\tau}.a))(\lambda a^\tau b^\sigma.a):\tau\to\tau$
+
+    \item $S K I=((\lambda x^{\tau\to\tau\to\tau}y^{\tau\to\tau}z^\tau.xz(yz))(\lambda a^\tau b^\tau.a))(\lambda x^\tau.x):\tau\to\tau$
+
+    \item $S = \lambda xyz.xz(yz)$
+
+        $$
+        \infer[3]
+        {
+            \vdash \lambda xyz.xz(yz):(\tau\to\sigma\to\rho)\to(\tau\to\sigma)\to(\tau\to\rho)
+        }
+        {
+            \infer[3]
+            {
+                x:\tau\to\sigma\to\rho \vdash \lambda yz.xz(yz):(\tau\to\sigma)\to(\tau\to\rho)
+            }
+            {
+                \infer[3]
+                {
+                    x:\tau\to\sigma\to\rho, y:\tau\to\sigma \vdash \lambda z.xz(yz):\tau\to\rho
+                }
+                {
+                    \infer[2]
+                    {
+                        x:\tau\to\sigma\to\rho, y:\tau\to\sigma, z:\tau \vdash xz(yz):\rho
+                    }
+                    {
+                        \infer[2]
+                        {
+                            x:\tau\to\sigma\to\rho, y:\tau\to\sigma, z:\tau \vdash xz:\sigma\to\rho
+                        }
+                        {
+                            x:\tau\to\sigma\to\rho, y:\tau\to\sigma, z:\tau \vdash x:\tau\to\sigma\to\rho
+                            \quad
+                            x:\tau\to\sigma\to\rho, y:\tau\to\sigma, z:\tau \vdash z:\tau
+                        }
+                        \quad
+                        \infer[2]
+                        {
+                            x:\tau\to\sigma\to\rho, y:\tau\to\sigma, z:\tau \vdash yz:\sigma
+                        }
+                        {
+                            \infer[1]{x:\tau\to\sigma\to\rho, y:\tau\to\sigma, z:\tau \vdash y:\tau\to\sigma}{}
+                            \quad
+                            \infer[1]{x:\tau\to\sigma\to\rho, y:\tau\to\sigma, z:\tau \vdash z:\tau}{}
+                        }
+                    }
+                }
+            }
+        }
+        $$
+
+\end{enumerate}
+
+\end{document}

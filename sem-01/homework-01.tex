@@ -1,0 +1,126 @@
+\documentclass[fontsize=14pt, paper=a4, pagesize, DIV=calc]{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{indentfirst} % Красная строка
+
+\newcommand{\lam}[2]{\backslash #1 \rightarrow #2}
+
+\begin{document}
+
+\section{Домашнее задание(Денис М.)}
+
+\begin{enumerate}
+\setcounter{enumi}{-1}
+\item Покажите, что
+
+\begin{enumerate}
+\item {\bf I = S K K}
+
+$\begin{array}{lcl} 
+S K K & = & (\lam{fgx}{f x (g x)}) K K \\ 
+      & =_{\beta} & (\lam{gx}{K x (g x))} K \\
+      & =_{\beta} & \lam{x}{K x (K x)} \\
+      & = & \lam{x}{x} \\
+      & = & I
+\end{array}$
+
+\item {\bf K* = K I}
+
+$\begin{array}{lcl} 
+K I & = & (\lam{xy}{x}) I \\ 
+    & =_{\beta} & \lam{y}{I} \\ 
+    & = & \lam{yx}{x} \\ 
+    & =_{\alpha} & \lam{zx}{x} \\ 
+    & =_{\alpha} & \lam{zy}{y} \\ 
+    & =_{\alpha} & \lam{xy}{y} \\ 
+    & = & K*
+\end{array}$
+
+\end{enumerate}
+
+\item Выделите свободные и связанные переменные в термах и осуществите подстановки:
+
+\begin{enumerate}
+\item $x(\lam{xy}{y (x w) u})y[x := \lam{z}{z}]$
+
+Свободные: w, u и только снаружи лямбды x, y
+
+Связанные: x и y внутри лямбды 
+
+$((x(\lam{xy}{y (x w) u})y)[x := \lam{z}{z}] = ((\lam{z}{z})(\lam{xy}{y (x w) u})y)$
+
+\item $(\lam{x}{x (\lam{y}{y x}) w}) (\lam{x}{v}) [w := y (\lam{v}{v x})] $
+
+Свободные: w, v
+
+Связанные: все вхождения x и y
+
+$(\lam{x}{x (\lam{y}{y x}) w}) (\lam{x}{v}) [w := y (\lam{v}{v x})] \\
+= (\lam{z}{z (\lam{y}{y z}) (y (\lam{v}{v x}))}) (\lam{x}{v})$
+
+\end{enumerate}
+
+\item Уберите лишние скобки и осуществите бета-преобразование(если это возможно):
+
+\begin{enumerate}
+
+\item $((\lam{x}{(\lam{y}{((x y) z)})}) (a (b c))) \\
+= (\lam{xy}{x y z}) (a (b c)) \\
+=_{\beta} \lam{y}{a (b c) y z}  $
+
+\item $(((m n) m) (\lam{x}{((x (u v)) y)})) \\
+= m n m (\lam{x}{x (u v) y}) $
+
+\item $((\lam{x}{(\lam{y}{((y x) x)})}) (x (x y)) y) \\
+= (\lam{xy}{y x x}) (x (x y)) y \\
+=_{\alpha} (\lam{xz}{z x x}) (x (x y)) y \\
+=_{\beta} (\lam{z}{z (x (x y)) (x (x y))}) y \\
+=_{\beta} y (x (x y)) (x (x y))
+$
+
+\end{enumerate}
+
+\item Покажите, что
+
+{\bf B = S (K S) K }
+
+$\begin{array}{lcl} 
+S (K S) K & = & (\lam{fgx}{f x (g x)}) (K S) K \\ 
+          & =_{\beta} & (\lam{gx}{K S x (g x)}) K \\ 
+          & =_{\beta} & \lam{x}{K S x (K x)} \\ 
+          & = & \lam{x}{(\lam{xy}{x}) S x (K x)} \\ 
+          & =_{\beta} & \lam{x}{(\lam{y}{S}) x (K x)} \\ 
+          & =_{\beta} & \lam{x}{S (K x)} \\ 
+          & = & \lam{x}{(\lam{f g x}{f x(g x)}) (K x)} \\ 
+          & =_{\alpha} & \lam{x}{(\lam{f g y}{f y(g y)}) (K x)} \\ 
+          & =_{\beta} & \lam{xgy}{K x y (g y)} \\ 
+          & = & \lam{xgy}{(\lam{xy}{x}) x y (g y)} \\ 
+          & =_{\beta} & \lam{xgy}{(\lam{y}{x}) y (g y)} \\ 
+          & =_{\beta} & \lam{xgy}{x (g y)} \\ 
+          & =_{\alpha} & \lam{fgy}{f (g y)} \\ 
+          & =_{\alpha} & \lam{fgx}{f (g x)} \\ 
+          & = & B
+\end{array}$
+
+\item Напишите терм, ведущий себя как логическая связка $xor$
+
+$xor = \lam{b1}{\lam{b2}{b1\ (b2\ fls\ tru)\ b2}}$
+
+\item Напишите терм, возводящий число Чёрча в степень(b – это основание, 
+а e – это показатель степени):
+
+Неправильно: $pow = \lam{be}{e (mult\ b) b}$ 
+
+Понял ошибку. Начинать нужно с единицы, а не с {\it b}
+
+Правильно будет: $pow = \lam{be}{e (mult\ b) \lam{sz}{sz}}$
+
+\item Напишите терм, вычитающий единицу из числа Чёрча:
+
+$pred = \lam{n}{p1(n (\lam{t}{pair (p2\ t) (succ (p1\ t))}) (pair\ 0\ 0)} $
+
+\end{enumerate}
+
+\end{document}

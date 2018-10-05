@@ -1,0 +1,169 @@
+\documentclass[fontsize=14pt, paper=a4, pagesize, DIV=calc]{article}
+
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{indentfirst} % Красная строка
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\newcommand{\lam}[2]{\backslash #1 \rightarrow #2}
+
+\begin{document}
+
+\section{Домашнее задание(Денис М.)}
+
+\begin{enumerate}
+
+\item 
+$\forall M, F M =_{\beta} M F$ \\
+$F =_{\beta} \lambda m . m F$ \\
+$F =_{\beta} (\lambda f m . m f) F$ \\
+$F =_{\beta} Y (\lambda f m . m f)$ \\
+$F =_{\beta} (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (\lambda f m . m f)$ \\
+
+\item
+$\forall M N, F M N =_{\beta} F N (M F)$ \\
+$F =_{\beta} (\lambda m n . F n (m F))$ \\
+$F =_{\beta} (\lambda f m n . f n (m f)) F$ \\
+$F =_{\beta} Y (\lambda f m n . f n (m f))$ \\
+$F =_{\beta} (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (\lambda f m n . f n (m f))$ \\
+
+\item
+$\forall M, F M =_{\beta} F M$ \\
+F - любой терм, потому что для любого F, $I(F M) \rightarrow_{\beta} F M$, то
+есть $F M =_{\beta} I (F M) =_{\beta} F M$.
+
+\item
+$\forall M, F M =_{\beta} F$ \\
+$F =_{\beta} (\lambda m . F)$ \\
+$F =_{\beta} (\lambda f m . f) F$ \\
+$F =_{\beta} Y (\lambda f m . f)$ \\
+$F =_{\beta} (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (\lambda f m . f)$ \\
+
+\item Для A, B, C найти F, G, H такие, что
+
+$
+\begin{cases} 
+    F =_{\beta} A F G H \\ 
+    G =_{\beta} B F G H \\ 
+    H =_{\beta} C F G H \\ 
+\end{cases}
+$
+
+$F =_{\beta} A F G H$\\
+$F =_{\beta} (\lambda f . A f G H) F$\\
+$F =_{\beta} Y (\lambda f . A f G H)$\\
+$F =_{\beta} (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (\lambda f . A f G H)$\\
+$F =_{\beta} (\lambda x . (\lambda f . A f G H) (x x)) (\lambda x . (\lambda f . A f G H) (x x)) $\\
+$F =_{\beta} (\lambda x . A (x x) G H) (\lambda x . A (x x) G H) $\\
+
+$G =_{\beta} B F G H$\\
+$G =_{\beta} B ((\lambda x . A (x x) G H) (\lambda x . A (x x) G H)) G H$\\
+$G =_{\beta} (\lambda g . B ((\lambda x . A (x x) g H) (\lambda x . A (x x) g H)) g H) G$\\
+$G =_{\beta} Y (\lambda g . B ((\lambda x . A (x x) g H) (\lambda x . A (x x) g H)) g H)$\\
+$G =_{\beta} (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (\lambda g . B ((\lambda x . A (x x) g H) (\lambda x . A (x x) g H)) g H)$\\
+$G =_{\beta} (\lambda y . B ((\lambda x . A (x x) (y y) H) (\lambda x . A (x x) (y y) H)) (y y) H)\\ 
+(\lambda y . B ((\lambda x . A (x x) (y y) H) (\lambda x . A (x x) (y y) H)) (y y) H) $\\
+
+$H =_{\beta} Y (C F G)$\\
+$H =_{\beta} Y (C F G)$\\
+$H =_{\beta} (\lambda x . C F G (x x)) (\lambda x . C F G (x x))$\\
+
+$
+\begin{cases} 
+    F =_{\beta} A F G (Y (C F G)) \\ 
+    G =_{\beta} B F G (Y (C F G)) \\ 
+\end{cases}
+$
+
+$G =_{\beta} (\lambda g . B F g (Y (C F g))) G$\\
+
+$F =_{\beta} A F (Y (\lambda g . B F g (Y (C F g))))$\\
+$F =_{\beta} (\lambda f . A f (Y (\lambda g . B f g (Y (C f g))))) F$\\
+$F =_{\beta} Y (\lambda f . A f (Y (\lambda g . B f g (Y (C f g)))))$\\
+$F =_{\beta} (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda f . A f ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda g . B f g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (C f g)))))$\\
+
+$G =_{\beta} (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda g . B ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda f . A f ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda g . B f g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (C f g)))))) \\
+g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(C ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda f . A f ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda g . B f g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (C f g)))))) g)))$
+
+$H = (\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(C ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda f . A f ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x)))\\
+(\lambda g . B f g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (C f g)))))) \\
+((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) 
+(\lambda g . B ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda f . A f ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda g . B f g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (C f g)))))) \\
+g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(C ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda f . A f ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) \\
+(\lambda g . B f g ((\lambda f . (\lambda x . f (x x)) (\lambda x . f (x x))) (C f g)))))) g)))))$
+
+\item 
+WHNF но не HNF: $\lambda x . (\lambda x . x) x$\\
+HNF но не NF: $x (\lambda x . x) x$\\
+не WHNF: $(\lambda x . x) x$\\
+
+\item
+$\nexists F \forall M N, F (M N) =_{\beta} M$
+
+Доказательство:
+
+Допустим существует такой терм F, что $F (M N) =_{\beta} M$ для любого терма M и N.
+
+Тогда
+
+$F ((\lambda x . x)((\lambda x y . y x)(\lambda x . x))) =_{\beta} \lambda x . x$\\
+$F ((\lambda x . x)((\lambda x y . y x)(\lambda x . x))) \\
+=_{\beta} F ((\lambda x y . y x)(\lambda x . x))
+=_{\beta} \lambda x y . y x $\\
+
+Нормальная форма существует и не определена однозначно. Предположение, что существует такой F
+неверно.
+
+\clearpage
+
+\item
+Построим терм $N'$ из $M$ путём замены всех редексов по правилу
+
+$$(\lambda x . A) B \rightarrow (i (\lambda x . A) B),$$ где $A$ и $B$ некоторые подтермы $M$.
+
+Пусть $N = (\lambda i . N')$, тогда в N нет редексов, то есть он находится в нормальной форме
+и $NI = M$.
+
+\item 
+$\text{leftmost}$\\
+$ = \lambda t . \text{if } (\text{isleaf } t) (\text{value } t) (\text{leftmost } (\text{left } t))$\\
+$ = Y (\lambda f t . \text{if } (\text{isleaf } t) (\text{value } t) (f (\text{left } t)))$\\
+
+\item
+$\text{count}$\\
+$ = \lambda t . \text{if } (\text{isleaf } t) 1 (\text{plus } (\text{count } (\text{left } t)) (\text{count } (\text{right } t)))$\\
+$ = Y (\lambda f t . \text{if } (\text{isleaf } t) 1 (\text{plus } (f (\text{left } t)) (f (\text{right } t))))$
+
+\item
+$\text{sum}$\\
+$ = \lambda t  .\text{if } (\text{isleaf } t) (\text{value } t) (\text{plus } (\text{sum } (\text{left } t)) (\text{sum } (\text{right } t)))$\\
+$ = Y (\lambda f t . \text{if } (\text{isleaf } t) (\text{value } t) (\text{plus } (f (\text{left } t)) (f (\text{right } t))))$
+
+\item
+\begin{verbatim}
+usedIn = fix(\f var term ->
+    case term of
+        Var v -> v = var
+        App a b -> f var a || f var b
+        Lam v b -> v = var || f var b
+\end{verbatim}
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,185 @@
+\documentclass[12pt, a4paper] {article} 
+\usepackage[utf8] {inputenc} 
+\usepackage[T2A]{fontenc} 
+\usepackage[english, russian] {babel} 
+\usepackage[usenames,dvipsnames]{xcolor} 
+\usepackage{listings,longtable,amsmath,amsfonts,graphicx,tikz,amssymb} 
+\usepackage{indentfirst,verbatim} 
+\usepackage[top=30pt,bottom=30pt,left=48pt,right=46pt]{geometry} 
+\usepackage{proof}
+\AtBeginDocument{\colorlet{defaultcolor}{.}}
+
+\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small}}{}
+
+\begin{document}
+\frenchspacing
+\pagestyle{empty}
+
+\section{Конспект практики}
+
+\subsection{Типы}
+
+На лямбда-термы можно навесить \emph{типы}. Определение типов не даём, оно есть
+в лекции, да все и так примерно его понимают.
+
+Типизируются только \emph{сильно нормализуемые} термы, то есть те термы, которые
+можно привести к нормальной форме независимо от последовательности редукций.
+
+Чтобы задать правила типизации, введём понятие \emph{контекста}. Контекстом
+назовём некоторое соответствие между именами переменных и связанными с ними
+типами.
+
+К примеру, в языке Си:
+
+\begin{lstlisting}[language=C,basicstyle=\small]
+int absurd(int a, char b, char *i)
+{
+        int c = 5;
+        for (int i = 0; i < 15; ++i) {
+                i -= 1; // point 1
+                long r = i;
+                i *= 0; // point 2
+        }
+        c = a + (int)b; // point 3
+}
+\end{lstlisting}
+
+В точке 1 контекст можно принять за $\{a : \mathrm{int},\, b : \mathrm{char},\,
+c : \mathrm{int},\, i : \mathrm{int}\}$, в точке 2~--- за $\{a : \mathrm{int},\,
+b : \mathrm{char},\, c : \mathrm{int},\,  i : \mathrm{int},\, r :
+\mathrm{long}\}$, в точке 3~--- за $\{a : \mathrm{int},\, b : \mathrm{char},\, c
+: \mathrm{int},\, i : \mathrm{char *}\}$\footnote{Конечно, всё сложнее: в
+контекст также входит, к примеру, сама функция absurd, да и вообще все видимые
+функции и глобальные переменные, но мы тут не Си изучаем.}.
+Контекст нужен для того, чтобы анализировать небольшие выражения~--- к примеру,
+``\texttt{i -= 1}'',~--- помня про окружение (\emph{контекст}) данного
+высказывания лишь необходимое.
+
+Для типизации используются три правила:
+
+\begin{enumerate}
+  \item $$(x: \sigma) \in \Gamma \Longrightarrow \Gamma \vdash x: \sigma$$
+  \item $$\infer{\Gamma \vdash A B : \tau}
+                {\Gamma \vdash A : \sigma \to \tau & \Gamma \vdash B : \sigma}$$
+  \item $$\infer{\Gamma \vdash \lambda x^{\color{red} \sigma}.~M : \sigma \to \tau}
+                {\{x : \sigma\} \cup \Gamma \vdash M : \tau}$$
+\end{enumerate}
+
+\subsection{Типизация \textbf{B}}
+
+Терм замкнутый, так что берём пустой контекст.
+
+\begin{enumerate}
+  \item $\lambda f~g~x.~f~(g~x)$~--- это абстракция. Применяем правило 3.
+    $${\color{red} \infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : ?_1 \to ?_2}
+            {\{f: ?_1\} \vdash \lambda g~x.~f~(g~x) : ?_2} }$$
+  \item $\lambda g~x.~f~(g~x)$~--- это абстракция. Применяем правило 3. Заметим,
+    что $?_2$~--- это тип-стрелка, и разобьём его: $?_2 = ?_3 \to ?_4$.
+    $$\infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : ?_1 \to {\color{red} ?_3 \to ?_4}}{
+      \color{red}
+      \infer[3]{\color{defaultcolor} \{f: ?_1\} \vdash \lambda g~x.~f~(g~x) : {\color{red} ?_3 \to ?_4}}{
+               {\{f: ?_1, g: ?_3\} \vdash \lambda x.~f~(g~x) : ?_4 }
+      }}$$
+  \item $\lambda x.~f~(g~x)$~--- это снова абстракция (но последняя). Снова
+    правило 3. $?_4$~--- это тип-стрелка, пусть $?_4 = ?_5 \to ?_6$.
+    $$\infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : ?_1 \to ?_3 \to {\color{red}?_5 \to ?_6}}{
+      \infer[3]{\{f: ?_1\} \vdash \lambda g~x.~f~(g~x) : ?_3 \to {\color{red}?_5 \to ?_6}}{
+      \color{red} \infer[3]{\color{defaultcolor} \{f: ?_1, g: ?_3\} \vdash \lambda x.~f~(g~x) : {\color{red}?_5 \to ?_6} }{
+               {\{f: ?_1, g: ?_3, x: ?_5\} \vdash f~(g~x) : ?_6 }
+      }}}$$
+  \item $f~(g~x)$~--- это, наконец, аппликация. Применимо правило 2.
+    $$\infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : ?_1 \to ?_3 \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_1\} \vdash \lambda g~x.~f~(g~x) : ?_3 \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_1, g: ?_3\} \vdash \lambda x.~f~(g~x) : ?_5 \to ?_6 }{
+      \color{red} \infer[2]{\color{defaultcolor} \{f: ?_1, g: ?_3, x: ?_5\} \vdash f~(g~x) : ?_6 }{
+               \{f: ?_1, g: ?_3, x: ?_5\} \vdash f : ?_7 \to ?_6 & \{f: ?_1, g: ?_3, x: ?_5\} \vdash g x : ?_7
+      }}}}$$
+  \item Пойдём в левую ветку. Там применимо правило типизации 1. Значит,
+    $?_1 = ?_7 \to ?_6$.
+    $$\infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : {\color{red} (?_7 \to ?_6)} \to ?_3 \to ?_5 \to ?_6}{
+      \infer[3]{\{f: {\color{red} ?_7 \to ?_6}\} \vdash \lambda g~x.~f~(g~x) : ?_3 \to ?_5 \to ?_6}{
+      \infer[3]{\{f: {\color{red} ?_7 \to ?_6}, g: ?_3\} \vdash \lambda x.~f~(g~x) : ?_5 \to ?_6 }{
+      \infer[2]{\{f: {\color{red} ?_7 \to ?_6}, g: ?_3, x: ?_5\} \vdash f~(g~x) }{
+               {\color{red} \infer[1]{\color{defaultcolor} \{f: {\color{red} ?_7 \to ?_6}, g: ?_3, x: ?_5\} \vdash f : {\color{red} ?_7 \to ?_6}}{}} &
+                \{f: {\color{red} ?_7 \to ?_6}, g: ?_3, x: ?_5\} \vdash g x : ?_7
+      }}}}$$
+  \item Теперь пойдём в правую ветку. Там аппликация и правило типизации 2. {\scriptsize
+    $$\infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : (?_7 \to ?_6) \to ?_3 \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_7 \to ?_6\} \vdash \lambda g~x.~f~(g~x) : ?_3 \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_7 \to ?_6, g: ?_3\} \vdash \lambda x.~f~(g~x) : ?_5 \to ?_6 }{
+      \infer[2]{\{f: ?_7 \to ?_6, g: ?_3, x: ?_5\} \vdash f~(g~x) }{
+               \infer[1]{\{f: ?_7 \to ?_6, g: ?_3, x: ?_5\} \vdash f : ?_7 \to ?_6}{} &
+      {\color{red} \infer[2]{\color{defaultcolor} \{f: ?_7 \to ?_6, g: ?_3, x: ?_5\} \vdash g x : ?_7}{
+               \{f: ?_7 \to ?_6, g: ?_3, x: ?_5\} \vdash g : ?_8 \to ?_7 &
+               \{f: ?_7 \to ?_6, g: ?_3, x: ?_5\} \vdash x : ?_8
+      }}}}}}$$ }
+  \item Пойдём в левую ветку. Там применимо правило 1, тогда $?_3 = ?_8 \to ?_7$.{\scriptsize
+    $$\infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : (?_7 \to ?_6) \to ({\color{red} ?_8 \to ?_7}) \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_7 \to ?_6\} \vdash \lambda g~x.~f~(g~x) : ({\color{red} ?_8 \to ?_7}) \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_7 \to ?_6, g: {\color{red} ?_8 \to ?_7}\} \vdash \lambda x.~f~(g~x) : ?_5 \to ?_6 }{
+      \infer[2]{\{f: ?_7 \to ?_6, g: {\color{red} ?_8 \to ?_7}, x: ?_5\} \vdash f~(g~x) }{
+               \infer[1]{\{f: ?_7 \to ?_6, g: {\color{red} ?_8 \to ?_7}, x: ?_5\} \vdash f : ?_7 \to ?_6}{} &
+      \infer[2]{\{f: ?_7 \to ?_6, g: {\color{red} ?_8 \to ?_7}, x: ?_5\} \vdash g x : ?_7}{
+               {\color{red} \infer[1]{\color{defaultcolor} \{f: ?_7 \to ?_6, g: {\color{red} ?_8 \to ?_7}, x: ?_5\} \vdash g : {\color{red} ?_8 \to ?_7}}{}} &
+               \{f: ?_7 \to ?_6, g: {\color{red} ?_8 \to ?_7}, x: ?_5\} \vdash x : ?_8
+      }}}}}$$}
+  \item Пойдём в правую ветку и получим итоговое дерево путём применения
+    правила 1 и замечания, что тогда $?_8 = ?_5$.{\scriptsize
+    $$\infer[3]{\emptyset \vdash \lambda f~g~x.~f~(g~x) : (?_7 \to ?_6) \to ({\color{red} ?_5} \to ?_7) \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_7 \to ?_6\} \vdash \lambda g~x.~f~(g~x) : ({\color{red} ?_5} \to ?_7) \to ?_5 \to ?_6}{
+      \infer[3]{\{f: ?_7 \to ?_6, g: {\color{red}?_5} \to ?_7\} \vdash \lambda x.~f~(g~x) : ?_5 \to ?_6 }{
+      \infer[2]{\{f: ?_7 \to ?_6, g: {\color{red}?_5} \to ?_7, x: ?_5\} \vdash f~(g~x) }{
+               \infer[1]{\{f: ?_7 \to ?_6, g: {\color{red}?_5} \to ?_7, x: ?_5\} \vdash f : ?_7 \to ?_6}{} &
+      \infer[2]{\{f: ?_7 \to ?_6, g: {\color{red}?_5} \to ?_7, x: ?_5\} \vdash g x : ?_7}{
+               \infer[1]{\{f: ?_7 \to ?_6, g: {\color{red}?_5} \to ?_7, x: ?_5\} \vdash g : {\color{red}?_5} \to ?_7}{} &
+               {\color{red} \infer[1]{\color{defaultcolor} \{f: ?_7 \to ?_6, g: {\color{red}?_5} \to ?_7, x: ?_5\} \vdash x : {\color{red} ?_5}}{}}
+      }}}}}$$}
+\end{enumerate}
+
+Полученный тип~--- $(?_7 \to ?_6) \to (?_5 \to ?_7) \to ?_5 \to ?_6$~---
+совпадает с интуицией.
+
+\section{Домашнее задание}
+
+Найдите наиболее общий тип:
+
+\begin{enumerate}
+  \item $\lambda x.~x$;
+  \item $\lambda x~x.~x$;
+  \item $\lambda x^{\alpha \to \alpha}.~x$;
+  \item $\lambda x.~x~\mathbf{K}~\mathbf{I}~x$;
+  \item $\lambda x~y~z.~x~(y~z~(z~x))$.
+\end{enumerate}
+
+Населите как можно большим количеством замкнутых термов типы или покажите, как
+сконструировать бесконечное их число:
+
+\begin{enumerate}
+\setcounter{enumi}{5}
+  \item $\alpha \to \alpha$;
+  \item $\alpha \to \alpha \to \alpha$;
+  \item $\alpha \to \alpha \to \alpha \to \alpha$;
+  \item $\alpha$;
+  \item $\alpha \to \beta \to \alpha$;
+  \item $\alpha \to \beta \to (\alpha \to \beta \to \gamma) \to \gamma$;
+  \item $\alpha \to (\alpha \to \alpha) \to \alpha$;
+  \item $((\alpha \to \beta) \to \alpha) \to (\alpha \to \alpha \to \beta) \to \beta$;
+  \item $((((\alpha \to \beta) \to \alpha) \to \alpha) \to \beta) \to \beta$.
+\end{enumerate}
+
+Типизируйте по Чёрчу:
+
+\begin{enumerate}
+\setcounter{enumi}{14}
+  \item $\mathbf{S}~\mathbf{K}~\mathbf{K}$;
+  \item $\mathbf{S}~\mathbf{K}~\mathbf{I}$.
+\end{enumerate}
+
+Честно, аксиоматически, типизируйте (можно писать в одно дерево, не по шагам):
+
+\begin{enumerate}
+\setcounter{enumi}{16}
+  \item Комбинатор $\mathbf{S}$.
+\end{enumerate}
+
+\end{document}
